@@ -4,7 +4,7 @@
 
   <groupId>com.zendesk</groupId>
   <artifactId>maxwell</artifactId>
-  <version>1.39.5</version>
+  <version>1.39.5-ANTLR-SHADE-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>maxwell</name>
@@ -291,7 +291,7 @@
       <artifactId>jedis</artifactId>
       <version>3.5.1</version>
     </dependency>
-    
+
     <!-- metrics -->
     <dependency>
       <groupId>io.dropwizard.metrics</groupId>
@@ -414,20 +414,20 @@
           <argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+<!--      <plugin>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <artifactId>maven-gpg-plugin</artifactId>-->
+<!--        <version>1.5</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <id>sign-artifacts</id>-->
+<!--            <phase>verify</phase>-->
+<!--            <goals>-->
+<!--              <goal>sign</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--      </plugin>-->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -543,6 +543,43 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
+              <keepDependenciesWithProvidedScope>false</keepDependenciesWithProvidedScope>
+              <artifactSet>
+                <includes>
+                  <include>org.antlr:*</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>org.antlr:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.MF</exclude>
+                  </excludes>
+                </filter>
+              </filters>
+              <relocations>
+                <relocation>
+                  <pattern>org.antlr</pattern>
+                  <shadedPattern>com.zendesk.maxwell.shaded.org.antlr</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
